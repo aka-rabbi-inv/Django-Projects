@@ -1,0 +1,151 @@
+html, body {
+  height: 100%;
+}
+#container {
+  position:relative;
+  min-height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#links {
+  padding-top: 20px;
+  padding-right: 30px;
+  padding-left: 30px;
+  font-size: small;
+  align-self: flex-end;
+}
+#links a {
+  color: black;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.logo-class{
+  position: relative;
+  height: auto;
+  left:25%;
+}
+
+.logo-subtext{
+  position: absolute;
+  left:355px;
+  bottom:100px;
+  color: #4285F4;
+}
+
+#search {
+  position: absolute;
+  top: 23%;
+  width: 560px;
+  bottom: auto;
+  align-self: center;
+  overflow:hidden;
+}
+
+@media only screen and (max-width: 550px) {
+  #search {
+      width: 490px;
+  }
+}
+
+form{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-button-class {
+  overflow:hidden;
+}
+
+.search-box-class {
+  display:flex;
+  justify-content:space-evenly;
+  width: 99%;
+  margin: 2em;
+  border: 1px solid;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  border-color:rgb(223,225,229);
+}
+
+#search-logo{
+  padding-left: 15px;
+  padding-right: 8px;
+}
+
+.icns{
+  align-self: center;
+}
+
+#search-btn{
+  padding-left: 13px;
+  padding-right: 15px;
+  outline: none;
+}
+
+
+#search-image{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#search-voice{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#search-box{
+  padding-left: 18px;
+  margin-right: 15px;
+  height:40px;
+  width: 80%;
+  background-color: rgba(0,0,0,0);
+  border: 0;
+  outline:none;
+  cursor: text;
+}
+
+
+.search-box-class:hover{
+  box-shadow: 0 8px 6px -6px gray;
+}
+
+
+
+#google-search {
+
+}
+
+#feeling-lucky {
+
+}
+
+.button-main{
+  font-weight: normal;
+  position: relative;
+  height: 40px;
+  width:8.5em;
+  margin-left: 6px;
+  margin-right: 6px;
+  background-color:#F8F9FA;
+  border:0;
+}
+
+.button-main:hover{
+  border:2px ridge;
+  box-shadow:  2px 2px 6px -4px gray;
+}
+
+.button-main:active{
+  border:2px solid #4285F4;
+  border-color: #4285F4;
+}
+/*# sourceMappingURL=main.css.map */
+

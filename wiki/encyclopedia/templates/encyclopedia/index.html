@@ -1,0 +1,23 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% load static %}
+
+{% block head %}
+    <link href="{% static 'encyclopedia/styles.css' %}" rel="stylesheet">
+{% endblock head %}
+
+
+{% block title %}
+    Encyclopedia
+{% endblock %}
+
+{% block body %}
+    <h1>All Pages</h1>
+
+    <ul>
+        {% for entry in entries %}
+            <li><a href="/wiki/{{entry}}"> {{ entry }}</a></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

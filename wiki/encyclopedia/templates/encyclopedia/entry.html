@@ -1,0 +1,24 @@
+{% extends "encyclopedia/layout.html" %} 
+
+{% load static %}
+
+{% block head %}
+    <link href="{% static 'encyclopedia/styles.css' %}" rel="stylesheet">
+{% endblock head %}
+
+
+{% block title %}
+    {{entry}}
+{% endblock %}
+
+{% block body %}
+
+    <div>
+        {{content | safe}}
+    </div>
+
+    <div>
+        <a href="{% url 'edit_page' id=entry%}">Edit Page</a>
+    </div>
+
+{% endblock %}
