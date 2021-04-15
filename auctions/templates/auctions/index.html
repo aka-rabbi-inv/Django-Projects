@@ -1,0 +1,54 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% block head %} 
+<style>
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    a:link{
+        text-decoration: none;
+    }
+    a:hover{
+        color: blueviolet;
+    }
+    .auctionItem{
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        height:300px;
+        width: 95%;
+        border: 1px solid black;
+        margin:10px;
+        padding:10px;
+    }
+    .itemPicture{
+        height: 250px;
+        width: 300px;
+        margin-right: 80px;
+    }
+</style>
+{% endblock head %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+    
+    {% if user.is_authenticated %}
+        {% for item in items %}
+            {% if item.active %}
+            <a href="{% url 'item_page' item_id=item.id %}">
+                <div class="auctionItem">
+                    <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
+                    <div>
+                        <h5>{{item.title}} </h5>
+                        <h6>{{item.description}}</h6>
+                        <h6><strong>Price: </strong>${{item.starting_bid}}</h6>
+
+                    </div>
+                </div>
+            </a>
+            {% endif %}
+        {% endfor %}
+
+    {% endif %}
+{% endblock %}
