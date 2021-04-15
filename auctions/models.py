@@ -23,8 +23,8 @@ class Bids(models.Model):
     winning_bid = models.BooleanField(null=True)
 
 class WatchList(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="links")
-    itemID = models.IntegerField(unique=True)
+    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_watchlist")
+    itemID = models.ForeignKey(AuctionListing, on_delete=models.DO_NOTHING, related_name="item_watchlist")
     item_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(blank=True, null=True)

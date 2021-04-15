@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.db import IntegrityError
 
 from .models import User, AuctionListing, WatchList
 
@@ -11,7 +12,6 @@ user = User.objects.none()
 def index(request):
     global user
     items = AuctionListing.objects.all()
-    print(items)
     return render(request, "auctions/index.html", {
         'items':items,
         })
@@ -98,15 +98,17 @@ def add_to_watchlist(request):
     user_id = request.user.id
     user = User.objects.get(id=user_id)
     item_id = request.POST.get("item_id")
-    # try:
-    watched_item = WatchList.objects.get(id=item_id)
-    print(watched_item.item_active)
-    #watched_item.item_active = not watched_item.item_active
-    print(watched_item.item_active)
+    item_active = True
+    
+    try:
+        watchlist_item = WatchList.objects.get(owner=user, itemID=AuctionListing.objects.get(id=item_id))
+        watchlist_item.item_active = not watchlist_item.item_active
+        watchlist_item.save()
+
+    except Exception:
+        WatchList.objects.create(owner=user, itemID=AuctionListing.objects.get(id=item_id), item_active=item_active)
+    
     return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
-    # except Exception as e:
-    #     WatchList.objects.create(owner=user, itemID=item_id, item_active=True)
-    #     return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
 
 def show_watchlist(request):
     user_id = request.user.id
@@ -115,6 +117,6 @@ def show_watchlist(request):
     listings = AuctionListing.objects.filter( pk__in=watchlist_items.values_list('itemID') )
 
     return render(request, "auctions/watchlist.html", {
-        "items": listings,
+        "items": zip(listings, watchlist_items),
     })
 

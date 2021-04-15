@@ -5,11 +5,6 @@
 {% endblock head %}
 
 {% block body %}
-    <h2>{{ item.title }}</h2>
-    <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
-    <h6>{{item.description}}</h6>
-    <h6>{{item.category}}</h6>
-    <h6><strong>Price: </strong>${{item.starting_bid}}</h6>
     {% if user.is_authenticated %}
         
         <div class="valid_user_menu">
@@ -20,6 +15,11 @@
             </form>
         </div>     
         
-
     {% endif %}
+    <h2>{{ item.title }}</h2>
+    <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
+    <h6>{{item.description}}</h6>
+    <h6>{{item.category}}</h6>
+    <h6><strong>Price: </strong>${{item.starting_bid}}</h6>
+    
 {% endblock %}

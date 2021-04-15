@@ -7,14 +7,17 @@
 {% block body %}
     {% if user.is_authenticated %}
         <h2>Watchlist for user {{ user.username }}</h2>
-        {% for item in items %}
-            {% if watchlist.objects.get(id=item.id).item_active %}
+        {% for item,watchlist in items %}
+
+            {% if watchlist.item_active %}
                 <ul>
                     <a href="{% url 'item_page' item_id=item.id %}">
                         <li>{{ item.title }}</li>
                     </a>
                 </ul>
             {% endif %}
+
+
         {% endfor %}
 
     {% endif %}
