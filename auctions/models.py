@@ -7,7 +7,7 @@ class User(AbstractUser):
 
 class AuctionListing(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="member")
-    title =  models.TextField(max_length=15)
+    title =  models.TextField(max_length=25)
     description =  models.TextField()
     starting_bid =  models.FloatField()
     item_picture = models.TextField(blank=True,null=True)
@@ -19,14 +19,17 @@ class AuctionListing(models.Model):
 
 class Bids(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="member_bid")
-    itemID = models.ForeignKey(AuctionListing, on_delete=models.DO_NOTHING, related_name="item_bid")
+    itemID = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="item_bid")
     bid = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
     winning_bid = models.BooleanField(null=True)
+    
+    class Meta:
+        verbose_name_plural = "Bids"
 
 class WatchList(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_watchlist")
-    itemID = models.ForeignKey(AuctionListing, on_delete=models.DO_NOTHING, related_name="item_watchlist")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_watchlist")
+    itemID = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="item_watchlist")
     item_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
@@ -34,7 +37,11 @@ class WatchList(models.Model):
 
 class Comments(models.Model):
     comment = models.TextField(max_length=200)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_comments")
     listing = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="comments")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        verbose_name_plural = "Comments"

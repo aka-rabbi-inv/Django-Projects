@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.db.models import Max
 
-from .models import User, AuctionListing, WatchList, Bids
+from .models import User, AuctionListing, WatchList, Bids, Comments
 
 user = User.objects.none()
 
@@ -20,8 +20,11 @@ def maximum_bid(item):
 def index(request):
     global user
     items = AuctionListing.objects.filter(active=1)
+    category_names = items.values_list("category", flat=True)
+    
     return render(request, "auctions/index.html", {
         'items':items,
+        'categories':list(category_names),
         })
 
 
@@ -96,18 +99,39 @@ def create_listing(request):
     return render(request, "auctions/create.html")
 
 def show_item(request, item_id, message=""):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
     item = AuctionListing.objects.get(id=item_id)
+        
     current_price = maximum_bid(item)
-    bid = Bids.objects.get(bid=current_price)
-    if bid.winning_bid and bid.owner == user:
-        win_message = "You have won this bid!"
-    else:
-        win_message = ""
+    try:
+        watchlist_item = WatchList.objects.get(owner=user, itemID=item)
+        if watchlist_item.item_active:
+            watchlist_image="auctions/eye_close.svg"
+        else:
+            watchlist_image="auctions/eye.svg"
+    except Exception as e:
+        watchlist_image="auctions/eye.svg" 
+    try:
+        bid = Bids.objects.get(bid=current_price)
+        
+        if bid.winning_bid and bid.owner == user:
+            win_message = "You have won this bid!"
+        else:
+            win_message = ""        
+    except Exception as e:
+        win_message = "" 
+        
+        
+    comments = Comments.objects.filter(listing=item)
+    
     return render(request, "auctions/item_page.html", {
         'item':item,
         'message':message,
         'price':current_price,
         'winner':win_message,
+        'comments':comments,
+        'watchlist_image':watchlist_image,
     })
     
 
@@ -143,12 +167,15 @@ def close_or_open(request):
     item_id = request.POST.get("item_id")
     item = AuctionListing.objects.get(id=item_id)
     current_price = maximum_bid(item)
-    bid = Bids.objects.get(bid=current_price)
-    if item.active:
-        
-        bid.winning_bid = 1
-        bid.save()
-        winner = bid.owner
+    try:
+        bid = Bids.objects.get(bid=current_price)
+        if item.active and bid.owner is not user:
+            
+            bid.winning_bid = 1
+            bid.save()
+            winner = bid.owner
+    except Exception as e:
+        pass
         
     item.active = not item.active
     item.save()
@@ -172,3 +199,18 @@ def place_bid(request):
             Bids.objects.create(owner=user, itemID=item, bid=float(bid_amount))
             return HttpResponseRedirect( reverse("item_with_message", kwargs={"item_id":item_id, "message":"Your bid has been placed."}) )        
         
+def add_comment(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+    item_id = request.POST.get("item_id")
+    item = AuctionListing.objects.get(id=item_id) 
+    comment = request.POST.get("comment")
+    Comments.objects.create(owner=user, listing=item, comment=comment)
+    return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
+
+def show_category(request, type):
+    items = AuctionListing.objects.filter(active=1, category=type)
+    
+    return render(request, "auctions/index.html", {
+        'items':items,
+        })

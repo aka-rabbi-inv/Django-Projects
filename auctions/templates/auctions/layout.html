@@ -10,9 +10,9 @@
     </head>
     <body>
         <h1>Auctions</h1>
-        <div>
+        <div style="display: flex; justify-content: flex-end;">
             {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
+                Signed in as <strong style="margin-left: 9px;">{{ user.username }}</strong>
             {% else %}
                 Not signed in.
             {% endif %}
