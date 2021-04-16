@@ -3,15 +3,23 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.db import IntegrityError
+from django.db.models import Max
 
-from .models import User, AuctionListing, WatchList
+from .models import User, AuctionListing, WatchList, Bids
 
 user = User.objects.none()
 
+def maximum_bid(item):
+    
+    max_bid = Bids.objects.filter(itemID=item).aggregate(Max("bid"))
+    if not max_bid["bid__max"]:
+        return item.starting_bid
+    elif max_bid["bid__max"] > item.starting_bid:
+        return max_bid["bid__max"]
+
 def index(request):
     global user
-    items = AuctionListing.objects.all()
+    items = AuctionListing.objects.filter(active=1)
     return render(request, "auctions/index.html", {
         'items':items,
         })
@@ -87,36 +95,80 @@ def create_listing(request):
 
     return render(request, "auctions/create.html")
 
-def show_item(request, item_id):
+def show_item(request, item_id, message=""):
     item = AuctionListing.objects.get(id=item_id)
-
+    current_price = maximum_bid(item)
+    bid = Bids.objects.get(bid=current_price)
+    if bid.winning_bid and bid.owner == user:
+        win_message = "You have won this bid!"
+    else:
+        win_message = ""
     return render(request, "auctions/item_page.html", {
         'item':item,
+        'message':message,
+        'price':current_price,
+        'winner':win_message,
     })
+    
 
-def add_to_watchlist(request):
+def add_show_watchlist(request):
     user_id = request.user.id
     user = User.objects.get(id=user_id)
-    item_id = request.POST.get("item_id")
-    item_active = True
-    
-    try:
-        watchlist_item = WatchList.objects.get(owner=user, itemID=AuctionListing.objects.get(id=item_id))
-        watchlist_item.item_active = not watchlist_item.item_active
-        watchlist_item.save()
+    if request.method == "POST":
+        
+        item_id = request.POST.get("item_id")
+        item_active = True
+        
+        try:
+            watchlist_item = WatchList.objects.get(owner=user, itemID=AuctionListing.objects.get(id=item_id))
+            watchlist_item.item_active = not watchlist_item.item_active
+            watchlist_item.save()
 
-    except Exception:
-        WatchList.objects.create(owner=user, itemID=AuctionListing.objects.get(id=item_id), item_active=item_active)
-    
-    return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
+        except Exception:
+            WatchList.objects.create(owner=user, itemID=AuctionListing.objects.get(id=item_id), item_active=item_active)
+        
+        return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
 
-def show_watchlist(request):
-    user_id = request.user.id
-    user = User.objects.get(id=user_id)
     watchlist_items = WatchList.objects.filter(owner=user)
     listings = AuctionListing.objects.filter( pk__in=watchlist_items.values_list('itemID') )
 
     return render(request, "auctions/watchlist.html", {
         "items": zip(listings, watchlist_items),
     })
+    
 
+def close_or_open(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+    item_id = request.POST.get("item_id")
+    item = AuctionListing.objects.get(id=item_id)
+    current_price = maximum_bid(item)
+    bid = Bids.objects.get(bid=current_price)
+    if item.active:
+        
+        bid.winning_bid = 1
+        bid.save()
+        winner = bid.owner
+        
+    item.active = not item.active
+    item.save()
+    return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
+
+def place_bid(request):
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
+    if request.method == "POST":
+        item_id = request.POST.get("item_id")
+        item = AuctionListing.objects.get(id=item_id) 
+        bid_amount = request.POST.get("bid")
+        current_price = maximum_bid(item)
+        if float(bid_amount) < item.starting_bid:
+            return HttpResponseRedirect( reverse("item_with_message", kwargs={"item_id":item_id, "message":"Bid cannot be less than starting bid!"}) )
+        
+        elif float(bid_amount) <= current_price:
+            return HttpResponseRedirect( reverse("item_with_message", kwargs={"item_id":item_id, "message":"Your bid has to be greater than the current price!"}) )
+        
+        elif float(bid_amount) > current_price and float(bid_amount) > item.starting_bid:
+            Bids.objects.create(owner=user, itemID=item, bid=float(bid_amount))
+            return HttpResponseRedirect( reverse("item_with_message", kwargs={"item_id":item_id, "message":"Your bid has been placed."}) )        
+        

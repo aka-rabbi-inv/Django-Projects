@@ -6,20 +6,63 @@
 
 {% block body %}
     {% if user.is_authenticated %}
-        
+        {% if item.active %}
+            <div class="valid_user_menu">
+                <form action="{% url 'place_bid' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="number" name="bid" placeholder="place your bid">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="submit" value="place">
+                </form>
+            </div>  
+        {% elif winner %}
+            <h2>{{ winner }}</h2>
+        {% endif %}
+        {% if message %}
+            <div>{{ message }}</div>
+        {% endif %}
         <div class="valid_user_menu">
-            <form action="{% url 'add_watchlist' %}" method="POST">
+            <form action="{% url 'add_show_watchlist' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="item_id" value="{{ item.id }}">
                 <input type="submit" value="watchlist">
             </form>
-        </div>     
+        </div>  
+        
+        {% if item.owner == user %}
+        <div class="valid_user_menu">
+            <form action="{% url 'close_open_listing' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                {% if item.active %}
+                    <input type="submit" value=" close bidding ">
+                {% else %}
+                    <input type="submit" value=" open bidding ">
+                {% endif %}
+            </form>
+        </div> 
+        {% endif %} 
         
     {% endif %}
     <h2>{{ item.title }}</h2>
     <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
     <h6>{{item.description}}</h6>
     <h6>{{item.category}}</h6>
-    <h6><strong>Price: </strong>${{item.starting_bid}}</h6>
+    <h6><strong>Price: </strong>${{price}}</h6>
+
+    {% if user.is_authenticated %}
+
+    <div>
+        <form action="{% url 'add_comment' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="bid" placeholder="Add a public comment...">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="submit" value="watchlist">
+        </form>
+    </div> 
+
+    {% endif %}
+
+    
     
 {% endblock %}
