@@ -21,6 +21,7 @@
         border: 1px solid black;
         margin:10px;
         padding:10px;
+        background-color: #F5F5F5;
     }
     .itemPicture{
         height: 250px;
@@ -85,10 +86,10 @@
                 <div class="auctionItem">
                     <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
                     <div>
-                        <h5>{{item.title}} </h5>
-                        <h6>{{item.description}}</h6>
+                        <h5>{{item.title}}</h5>
+                        <p class="lead"><small>{{item.description|truncatechars:50}}</small></p>
                         <h6><strong>Starting price: </strong>${{item.starting_bid}}</h6>
-
+                        <h6 class="text-muted">Posted by: {{item.owner.username}}</h6>
                     </div>
                 </div>
             </a>

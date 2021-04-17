@@ -24,7 +24,7 @@ def index(request):
     
     return render(request, "auctions/index.html", {
         'items':items,
-        'categories':list(category_names),
+        'categories':list(dict.fromkeys(category_names)),
         })
 
 
@@ -114,14 +114,16 @@ def show_item(request, item_id, message=""):
         watchlist_image="auctions/eye.svg" 
     try:
         bid = Bids.objects.get(bid=current_price)
-        
+        created_at = bid.created_at
+        created_by = bid.owner
         if bid.winning_bid and bid.owner == user:
             win_message = "You have won this bid!"
         else:
             win_message = ""        
     except Exception as e:
         win_message = "" 
-        
+        created_at = item.created_at
+        created_by = item.owner
         
     comments = Comments.objects.filter(listing=item)
     
@@ -132,6 +134,8 @@ def show_item(request, item_id, message=""):
         'winner':win_message,
         'comments':comments,
         'watchlist_image':watchlist_image,
+        'created':created_at,
+        'owner':created_by,
     })
     
 

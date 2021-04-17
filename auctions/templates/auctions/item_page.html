@@ -1,71 +1,107 @@
 {% extends "auctions/layout.html" %}
 {% load static %}
 {% block head %} 
-<script>
-    function watchList() {
-
+<style>
+    html, body {
+        height: 100%;
     }
-</script>
+    .full-height {
+        height: 100%;
+    }
+    .itemPicture{
+        margin-right: 120px;
+        margin-bottom: 15px;
+        height: 500px;
+        width: 600px;
+    }
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    a:link{
+        text-decoration: none;
+    }
+    a:hover{
+        color: #2596be;
+    }
+    .valid_user_menu{
+        margin-right: 5px;
+    }
+</style>
+
 {% endblock head %}
 
 {% block body %}
-    {% if user.is_authenticated %}
-        <div style="display: flex;justify-content: space-between;">
-            {% if item.active %}
+    
+    <div style="display: flex;justify-content: space-around;">
+        <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
+        <div>
+            <div style="display: flex; justify-content: space-between;">
+                <h4>{{ item.title }}</h4>
+                {% if user.is_authenticated %}
                 <div class="valid_user_menu">
-                    <form action="{% url 'place_bid' %}" method="POST">
+                    <form action="{% url 'add_show_watchlist' %}" method="POST">
                         {% csrf_token %}
-                        <input type="number" name="bid" placeholder="place your bid">
                         <input type="hidden" name="item_id" value="{{ item.id }}">
-                        <input type="submit" value="place">
+                        <input type="image" src="{% static watchlist_image %}" data-toggle="tooltip" title="watchlist" border="0" alt="Submit" style="margin-right: 10px;"/>
+                        <!-- <input type="submit" value="watchlist"> -->
                     </form>
                 </div>  
-            {% elif winner %}
-                <h2>{{ winner }}</h2>
-            {% endif %}
-            {% if message %}
-                <div>{{ message }}</div>
-            {% endif %}
-            <div class="valid_user_menu">
-                <form action="{% url 'add_show_watchlist' %}" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <input type="image" src="{% static watchlist_image %}" data-toggle="tooltip" title="watchlist" border="0" alt="Submit" style="margin-right: 10px;"/>
-                    <!-- <input type="submit" value="watchlist"> -->
-                </form>
-            </div>  
-            
-            {% if item.owner == user %}
-            <div class="valid_user_menu">
-                <form action="{% url 'close_open_listing' %}" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    {% if item.active %}
-                        <input type="submit" value=" close bidding ">
-                    {% else %}
-                        <input type="submit" value=" open bidding ">
-                    {% endif %}
-                </form>
-            </div> 
-            {% endif %} 
-        </div>
-    {% endif %}
-    <h2>{{ item.title }}</h2>
-    <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
-    <h6>{{item.description}}</h6>
-    <h6>{{item.category}}</h6>
-    <h6><strong>Price: </strong>${{price}}</h6>
+                {% endif %}
+            </div>
+            <a href="{% url 'show_category' type=item.category %}"><h6>{{item.category}}</h6></a>
+            <p class="lead">{{item.description}}</p>
+            <h6 class="display-4">${{price}}</h6>
+            <h6 class="text-muted">Last bid on: {{created}} by {{ owner }}</h6>
 
+            {% if user.is_authenticated %}
+            <div style="display: flex;justify-content: flex-start;">
+                {% if item.active %}
+                    <div class="valid_user_menu">
+                        <form action="{% url 'place_bid' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="number" name="bid" placeholder="place your bid">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="submit" value="place">
+                        </form>
+                    </div>  
+                {% elif winner %}
+                    <h2>{{ winner }}</h2>
+                {% endif %}
+                
+    
+                {% if item.owner == user %}
+                <div class="valid_user_menu">
+                    <form action="{% url 'close_open_listing' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        {% if item.active %}
+                            <input type="submit" value=" close bidding ">
+                        {% else %}
+                            <input type="submit" value=" open bidding ">
+                        {% endif %}
+                    </form>
+                </div> 
+                {% endif %} 
+    
+                
+                
+            </div>
+            {% if message %}
+                    <div>{{ message }}</div>
+            {% endif %}
+        {% endif %}
+        </div>
+    </div>
+    <div style="padding-top:15px;background-color:#F5F5F5" class="full-height">
     {% if user.is_authenticated and item.active %}
 
-    <div>
         <form action="{% url 'add_comment' %}" method="POST" style="display: flex;">
             {% csrf_token %}
-            <input type="text" name="comment" placeholder="Add a public comment..." style="flex-grow: 1;">
+            <input type="text" name="comment" autocomplete="off" placeholder="Add a public comment..." style="flex-grow: 1;">
             <input type="hidden" name="item_id" value="{{ item.id }}">
             <input type="submit" value="COMMENT" style="margin-left: 5px;">
         </form>
-    </div> 
 
     {% endif %}
     {% for comment in comments %}
@@ -73,7 +109,7 @@
             <li class="nav-item">{{ comment.comment }}</li>
         </ul>
     {% endfor %}
-
+    </div>
     
     
 {% endblock %}
