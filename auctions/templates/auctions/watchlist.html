@@ -17,19 +17,15 @@
 
 {% block body %}
     {% if user.is_authenticated %}
-        <h2>Watchlist for user {{ user.username }}</h2>
-        {% for item,watchlist in items %}
-
-            {% if watchlist.item_active %}
+        <p class="lead">Watchlist for user: <b>{{ user.username }}</b></p>
+        {% for item in items %}
                 <ul>
-                    <a href="{% url 'item_page' item_id=item.id %}">
-                        <li>{{ item.title }}</li>
+                    <a href="{% url 'item_page' item_id=item.id %}" style="display: flex;">
+                        <img src="{{ item.item_picture }}" alt="item" style="width: 140px; height: auto;">
+                        <h6 style="padding-left: 40px;">{{ item.title }}</h6>
                     </a>
                 </ul>
-            {% endif %}
-
-
+            <hr>
         {% endfor %}
-
     {% endif %}
 {% endblock %}

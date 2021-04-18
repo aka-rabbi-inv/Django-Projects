@@ -2,6 +2,9 @@
 {% load static %}
 {% block head %} 
 <style>
+    html, body {
+        height: 100%;
+    }
     a{
         text-decoration: none;
         color: black;
@@ -10,7 +13,7 @@
         text-decoration: none;
     }
     a:hover{
-        color: #2596be;
+        color: #0268D9;
     }
     .auctionItem{
         display: flex;
@@ -18,10 +21,13 @@
         align-items: center;
         height:300px;
         width: 98%;
-        border: 1px solid black;
         margin:10px;
         padding:10px;
-        background-color: #F5F5F5;
+        background-color: #FFFFFF;
+    }
+    .auctionItem:hover{
+        background-color: #0268D9;
+        color: white;
     }
     .itemPicture{
         height: 250px;
@@ -29,7 +35,7 @@
         margin-right: 80px;
     }
     .dropbtn {
-        background-color: #f1f1f1;
+        background-color: #FFFFFF;
         color: black;
         padding: 16px;
         font-size: 16px;
@@ -61,40 +67,43 @@
 
     .dropdown:hover .dropdown-content {display: block;}
 
-    .dropdown:hover .dropbtn {background-color: #2596be;}
+    .dropdown:hover .dropbtn {background-color: #0268D9; color: white;}
 </style>
 {% endblock head %}
 
 {% block body %}
-    <div style="display:flex; justify-content: flex-start;">
-        <h2>Active Listings</h2>
-        {% if categories %}
-        <div class="dropdown" style="margin-left: 63px;">
-            <button class="dropbtn">Categories</button>
-            <div class="dropdown-content">
-                {% for category in categories %}
-                    <a href="{% url 'show_category' type=category %}">{{ category }}</a>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-    </div>
+    
     {% if user.is_authenticated %}
+        <div style="display:flex; justify-content: flex-start;">
+            <!-- <h2>Active Listings</h2> -->
+            {% if categories %}
+            <div class="dropdown" style="margin-left: 10px;">
+                <button class="dropbtn">Categories</button>
+                <div class="dropdown-content">
+                    {% for category in categories %}
+                        <a href="{% url 'show_category' type=category %}">{{ category }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
         {% for item in items %}
             {% if item.active %}
             <a href="{% url 'item_page' item_id=item.id %}">
-                <div class="auctionItem">
+                <div class="auctionItem rounded border border-primary" style="position: relative;">
                     <image class="itemPicture" src="{{ item.item_picture }}" alt="{{ item.title }}"></image>
                     <div>
                         <h5>{{item.title}}</h5>
                         <p class="lead"><small>{{item.description|truncatechars:50}}</small></p>
                         <h6><strong>Starting price: </strong>${{item.starting_bid}}</h6>
-                        <h6 class="text-muted">Posted by: {{item.owner.username}}</h6>
+                        <h6 class="small">Posted by: {{item.owner.username}}</h6>
                     </div>
+                    <div class="small" style="position: absolute;top: 8px;right: 16px; padding: 6px; " >{{ item.category }}</div>
                 </div>
             </a>
             {% endif %}
         {% endfor %}
-
+    {% else %}
+            <p class="lead"><i>Please sign in!</i></p>
     {% endif %}
 {% endblock %}

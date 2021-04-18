@@ -36,7 +36,7 @@ class WatchList(models.Model):
 
 
 class Comments(models.Model):
-    comment = models.TextField(max_length=200)
+    comment = models.CharField(max_length=200)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_comments")
     listing = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="comments")
     created_at = models.DateTimeField(auto_now_add=True)

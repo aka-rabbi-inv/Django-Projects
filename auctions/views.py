@@ -157,11 +157,11 @@ def add_show_watchlist(request):
         
         return HttpResponseRedirect( reverse("item_page", kwargs={"item_id":item_id}) )
 
-    watchlist_items = WatchList.objects.filter(owner=user)
-    listings = AuctionListing.objects.filter( pk__in=watchlist_items.values_list('itemID') )
-
+    watchlist_items = WatchList.objects.filter(owner=user, item_active=1)
+    listings = AuctionListing.objects.filter( pk__in=watchlist_items.values('itemID') )
+    print(listings)
     return render(request, "auctions/watchlist.html", {
-        "items": zip(listings, watchlist_items),
+        "items": listings,
     })
     
 

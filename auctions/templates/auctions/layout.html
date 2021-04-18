@@ -9,7 +9,7 @@
         {% block head %} {% endblock head %}
     </head>
     <body>
-        <h1>Auctions</h1>
+        <div class="display-4">Auctions</div>
         <div style="display: flex; justify-content: flex-end;">
             {% if user.is_authenticated %}
                 Signed in as <strong style="margin-left: 9px;">{{ user.username }}</strong>
@@ -18,24 +18,24 @@
             {% endif %}
         </div>
         <ul class="nav">
-            <li class="nav-item">
+            <li class="nav-item small">
                 <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
             </li>
             {% if user.is_authenticated %}
-                <li class="nav-item">
+                <li class="nav-item small">
                     <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item small">
                     <a class="nav-link" href="{% url 'add_show_watchlist' %}">Watchlist</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item small">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
             {% else %}
-                <li class="nav-item">
+                <li class="nav-item small">
                     <a class="nav-link" href="{% url 'login' %}">Log In</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item small">
                     <a class="nav-link" href="{% url 'register' %}">Register</a>
                 </li>
             {% endif %}
