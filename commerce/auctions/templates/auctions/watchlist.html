@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% block head %} 
+<style>
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    a:link{
+        text-decoration: none;
+    }
+    a:hover{
+        color: #2596be;
+    }
+</style>
+{% endblock head %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <p class="lead">Watchlist for user: <b>{{ user.username }}</b></p>
+        {% for item in items %}
+                <ul>
+                    <a href="{% url 'item_page' item_id=item.id %}" style="display: flex;">
+                        <img src="{{ item.item_picture }}" alt="item" style="width: 140px; height: auto;">
+                        <h6 style="padding-left: 40px;">{{ item.title }}</h6>
+                    </a>
+                </ul>
+            <hr>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
