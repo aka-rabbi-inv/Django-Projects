@@ -1,0 +1,18 @@
+textarea {
+    min-height: 400px;
+}
+
+.email-div{
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 5px 20px 5px;
+    /* margin: 10px; */
+}
+
+.email-div h6{
+    margin-right: 1px;
+}
+
+hr{
+    margin: 0.5px;
+}
