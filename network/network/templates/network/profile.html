@@ -1,0 +1,55 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block script %}
+<script>
+    const follow_button = document.querySelector('#follow-btn');
+    document.addEventListener('DOMContentLoaded', function() {
+        follow_button.onclick = (event) => {
+            // console.log(event.target.dataset.username);
+            fetch(`follow/${event.target.dataset.username}`)
+            .then(response =>{
+                if (response.status===201){
+                    location.reload();
+                }
+                else if (response.status===400){
+                    follow_button.setAttribute('title', 'You can not follow yourself!');
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock script %}
+
+{% block body %}
+    <div class="container">
+        {% if user.is_authenticated %}
+        
+        <i>{{profile.username}} has <strong>{{followers}}</strong> followers</i>
+        <i>and following <strong>{{following}}</strong> users</i> 
+
+        {% if is_following %}
+            <button id="follow-btn" data-username="{{profile.username}}" data-toggle="tooltip">Follow</button>
+        {% else %}
+            <button id="follow-btn" data-username="{{profile.username}}" data-toggle="tooltip">Unfollow</button>
+        {% endif %}
+
+        {% for post in posts %}
+            <div>
+                <div class="post" data-postid="{{post.pk}}">
+                    <a class="lead" href="{% url 'profile' profile_id=post.created_by.username %}">{{post.created_by.username}}</a>
+                    <mark class="small">{{post.created_at}}</mark>
+                    <div class='post-misc border rounded'>
+                        <div class ='text-content' style="margin-left: 5px;margin-top: 10px; margin-bottom:10px;">{{post.contents}}</div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        {% endfor %}
+        
+        
+        {% endif %}        
+    </div>
+{% endblock %}

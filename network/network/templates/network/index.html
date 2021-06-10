@@ -1,0 +1,232 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block head %}
+<script
+    src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+    crossorigin="anonymous">
+</script>
+{% endblock head %}
+
+{% block script %}
+<script>
+    let page_count = 0;
+    function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+        return cookieValue;
+    }
+
+    if (!localStorage.getItem('page')) {
+        // If not, set the counter to 0 in local storage
+        localStorage.setItem('page', 1);
+    }
+    const like_button = document.querySelectorAll('#like-btn');
+    const next_button = document.createElement('button');
+    const previous_button = document.createElement('button');
+    // let page = 1;
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch(`pages`)
+        .then(response => response.json())
+        .then(res => {
+            page_count = res['pages'];
+            if (page_count>1){
+                next_button.innerHTML = 'Next';
+                next_button.setAttribute('class', 'pagination');
+                document.querySelector('body').append(next_button);
+            }
+        });
+
+        if (localStorage.getItem('page')>1){
+            previous_button.innerHTML = 'Previous';
+            previous_button.setAttribute('class', 'pagination');
+            document.querySelector('body').append(previous_button);
+        }
+
+        //current like counts
+        document.querySelectorAll('.post').forEach(post => {
+            try{
+                post.querySelector('div .post-misc-btns #edit').onclick = (event) => {
+                    // console.log(post.querySelector('div .text-content'));
+
+                    //form create
+                    const post_content_element = post.querySelector('div .text-content');
+
+                    const post_content = post_content_element.innerHTML;
+
+                    let edit_form = document.createElement('form');
+
+                    edit_form.setAttribute('id', 'edit-form');
+                    edit_form.setAttribute('method', 'POST');
+                    // edit_form.setAttribute('edit-data-postid', `${post.dataset.postid}`);
+
+                    let text_content = document.createElement('textarea');
+                    // text_content.setAttribute('type', 'textarea');
+                    text_content.setAttribute('id', 'edit-content');
+                    text_content.value = post_content;
+                    // text_content.addEventListener('keydown', function (e) {
+                    //     if (e.keyCode === 13) {
+                    //         e.preventDefault();  
+                    //     }
+                    // });
+
+                    let submit = document.createElement('input');
+                    submit.setAttribute('type', 'submit');
+                    submit.setAttribute('id', 'edit-submit');
+                    submit.setAttribute('value', 'submit');
+
+                    let close_button = document.createElement('input');
+                    close_button.setAttribute('type', 'button');
+                    close_button.setAttribute('class', 'btn-close close');
+                    close_button.setAttribute('aria-label', 'Close');
+
+                    edit_form.appendChild(text_content);
+                    edit_form.appendChild(submit);
+                    post.querySelector('div .post-misc-btns').appendChild(close_button);
+
+
+                    post_content_element.replaceWith( edit_form );
+                    text_content.focus();
+
+                    post.querySelector('div #edit-form').onsubmit = () => {
+                        var form_data = {}
+                        form_data["post_id"] = post.dataset.postid;
+                        form_data["contents"] = post.querySelector('div #edit-form #edit-content').value;
+                        
+                        fetch('edit', {
+                            method:'PUT',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                "X-CSRFToken": getCookie("csrftoken")
+                            },  
+                            body:JSON.stringify(form_data),
+                            })
+                            .then(response => {
+                                if (response.status===201){
+                                    post_content_element.innerHTML = form_data["contents"];
+                                    edit_form.replaceWith( post_content_element );
+                                }
+                            });
+                        close_button.remove();
+                        return false;
+                    }
+                    close_button.onclick = () => {
+                        edit_form.replaceWith( post_content_element );
+                        close_button.remove();
+                    }
+                }
+            }
+                
+            catch(err){
+
+            }
+
+
+            fetch(`is_liked/${post.dataset.postid}`, {
+                method:"GET"
+            })
+            .then(response =>{
+                if (response.status===200){
+                    response.json().then(res => {
+                        if (res['unlike']===true){
+                            post.querySelector('#like-btn').setAttribute('class', 'filter-red');
+                        } else {
+                            post.querySelector('#like-btn').setAttribute('class', 'filter-black');
+                        }    
+                    });
+                }
+            });
+        });
+
+        //like-unlike
+        like_button.forEach(btn => {
+            btn.onclick = (event) => {
+            fetch(`like/${event.target.dataset.postid}`, {
+                method:"GET"
+            })
+            .then(response =>{
+                if (response.status===201){
+                    response.json().then(res => {
+                        event.target.nextElementSibling.innerHTML = res['likes'];
+
+                        if (res['unlike']===true){
+                            event.target.setAttribute('class', 'filter-black');
+                        } else {
+                            event.target.setAttribute('class', 'filter-red');
+                        }  
+                    });
+                }
+            });
+        }
+        });
+        
+
+    });
+
+    document.querySelectorAll('.nav-item, .navbar-brand').forEach(element => {
+        element.onclick = () => localStorage.setItem('page', 1);
+    });
+
+    next_button.onclick = () => {
+            let page = localStorage.getItem('page');
+            if (page < page_count){
+                localStorage.setItem('page', ++page);
+                location.href = `/?p=${page++}`
+            }
+        }
+
+    previous_button.onclick = () => {
+        let page = localStorage.getItem('page');
+        localStorage.setItem('page', --page);
+        location.href = `/?p=${page--}`
+    }
+
+</script>
+{% endblock script %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+    <div class="container">
+        New Post 
+        <form action="{% url 'create' %}" method="POST" style="display: flex; margin-bottom: 40px;">
+            {% csrf_token %}
+            <textarea name="post-content" id="post-content" cols="30" rows="10"></textarea>
+            <input type="submit" value="Post" style="align-self:flex-end; margin-left: 10px;">
+        </form>
+    
+        {% for post in posts %}
+        <div class="post" data-postid="{{post.pk}}">
+            <a class="lead" href="{% url 'profile' profile_id=post.created_by.username %}">{{post.created_by.username}}</a>
+            <mark class="small">{{post.created_at}}</mark>
+            <div class='post-misc border rounded'>
+                <div class ='text-content' style="margin-left: 5px;margin-top: 10px; margin-bottom:10px;">{{post.contents}}</div>
+                <div style="display:flex; align-self: center; margin-left: 30px;" class='post-misc-btns'>
+                    <img src="{% static 'network/unliked.svg' %}" class="filter-red" id="like-btn" data-postid="{{post.pk}}" name="edit" style="height: 20px;width: 20px;margin-right: 4px;" >
+                    <div id="like-count" >{{post.likes}}</div>
+                    {% if post.created_by == user %}
+                    <img src="{% static 'network/edit.svg' %}" alt="edit" id="edit" style="height: 20px;width: 20px; margin-left:14px;margin-right: 4px;" >
+                    {% endif %}
+                </div>
+                
+            </div>
+            
+            
+        </div>
+        {% endfor %}
+
+        {% endif %}
+    </div>
+    
+{% endblock %}
