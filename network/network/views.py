@@ -7,13 +7,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
-import io
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, Post, UserFollowing, PostLike
 from .serializers import PostSerializer

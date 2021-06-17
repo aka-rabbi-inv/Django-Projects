@@ -37,22 +37,24 @@
     const previous_button = document.createElement('button');
     // let page = 1;
     document.addEventListener('DOMContentLoaded', function() {
-        fetch(`pages`)
-        .then(response => response.json())
-        .then(res => {
-            page_count = res['pages'];
-            if (page_count>1){
-                next_button.innerHTML = 'Next';
-                next_button.setAttribute('class', 'pagination');
-                document.querySelector('body').append(next_button);
-            }
-        });
+        {% if user.is_authenticated %}
+            fetch(`pages`)
+            .then(response => response.json())
+            .then(res => {
+                page_count = res['pages'];
+                if (page_count>1){
+                    next_button.innerHTML = 'Next';
+                    next_button.setAttribute('class', 'pagination');
+                    document.querySelector('body').append(next_button);
+                }
+            });
 
-        if (localStorage.getItem('page')>1){
-            previous_button.innerHTML = 'Previous';
-            previous_button.setAttribute('class', 'pagination');
-            document.querySelector('body').append(previous_button);
-        }
+            if (localStorage.getItem('page')>1){
+                previous_button.innerHTML = 'Previous';
+                previous_button.setAttribute('class', 'pagination');
+                document.querySelector('body').append(previous_button);
+            }
+        {% endif %}
 
         //current like counts
         document.querySelectorAll('.post').forEach(post => {
@@ -69,17 +71,12 @@
 
                     edit_form.setAttribute('id', 'edit-form');
                     edit_form.setAttribute('method', 'POST');
-                    // edit_form.setAttribute('edit-data-postid', `${post.dataset.postid}`);
 
                     let text_content = document.createElement('textarea');
                     // text_content.setAttribute('type', 'textarea');
                     text_content.setAttribute('id', 'edit-content');
                     text_content.value = post_content;
-                    // text_content.addEventListener('keydown', function (e) {
-                    //     if (e.keyCode === 13) {
-                    //         e.preventDefault();  
-                    //     }
-                    // });
+
 
                     let submit = document.createElement('input');
                     submit.setAttribute('type', 'submit');

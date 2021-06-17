@@ -6,7 +6,6 @@
     const follow_button = document.querySelector('#follow-btn');
     document.addEventListener('DOMContentLoaded', function() {
         follow_button.onclick = (event) => {
-            // console.log(event.target.dataset.username);
             fetch(`follow/${event.target.dataset.username}`)
             .then(response =>{
                 if (response.status===201){
