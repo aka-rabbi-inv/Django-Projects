@@ -1,4 +1,4 @@
-An front-end for an email client that makes API calls to send and receive emails.
+An eBay-like e-commerce auction site that will allow users to post auction listings, place bids on listings, comment on those listings, and add listings to a “watchlist.”
 
 ![network](https://github.com/aka-rabbi/temp/blob/main/Screenshot%202021-06-17%20120745.png?raw=true)
 
