@@ -1,7 +1,5 @@
-A front-end for an email client that makes API calls to send and receive emails.
+A front-end for Google Search, Google Image Search, and Google Advanced Search.
 
-![network](https://github.com/aka-rabbi/temp/blob/main/Screenshot%202021-06-17%20120100.png?raw=true)
-
-video for demonstration - https://www.youtube.com/watch?v=RTYyNyzg500
+video for demonstration - https://www.youtube.com/watch?v=y3Fv5IDsDOY
 
 
