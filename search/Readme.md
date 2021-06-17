@@ -1,0 +1,7 @@
+A front-end for an email client that makes API calls to send and receive emails.
+
+![network](https://github.com/aka-rabbi/temp/blob/main/Screenshot%202021-06-17%20120100.png?raw=true)
+
+video for demonstration - https://www.youtube.com/watch?v=RTYyNyzg500
+
+
