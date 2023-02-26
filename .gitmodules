@@ -1,0 +1,3 @@
+[submodule "shop_management"]
+	path = shop_management
+	url = https://github.com/aka-rabbi/shop_management.git
